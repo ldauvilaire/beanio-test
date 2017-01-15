@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<beanio xmlns="http://www.beanio.org/2012/03" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.beanio.org/2012/03 http://www.beanio.org/2012/03/mapping.xsd">
+
+	<stream name="g-csv" format="csv" minOccurs="1" maxOccurs="unbounded">
+
+		<record name="controlHeader" order="1" class="net.ldauvilaire.beanio.bean.ControlHeader" minOccurs="1" maxOccurs="1">
+			<field name="type" rid="true" literal="CH" />
+		</record>
+
+		<group name="functionGroup" order="2" class="net.ldauvilaire.beanio.bean.FunctionGroup" minOccurs="1" maxOccurs="unbounded">
+
+			<record name="functionGroupHeader" order="1" class="net.ldauvilaire.beanio.bean.FunctionGroupHeader" minOccurs="1" maxOccurs="1">
+				<field name="type" rid="true" literal="FH" />
+				<field name="name" minOccurs="0" />
+			</record>
+
+			<group name="transactionSet" order="2" class="net.ldauvilaire.beanio.bean.TransactionSet" collection="list" minOccurs="0" maxOccurs="unbounded">
+
+				<record name="header" order="1" class="net.ldauvilaire.beanio.bean.TransactionSetHeader" minOccurs="1" maxOccurs="1">
+					<field name="type" rid="true" literal="TH" />
+					<field name="name" minOccurs="0" />
+				</record>
+				<record name="transaction" order="2" class="net.ldauvilaire.beanio.bean.Transaction" collection="list" minOccurs="0" maxOccurs="unbounded">
+					<field name="type" rid="true" literal="T" />
+					<field name="amount" />
+				</record>
+				<record name="trailer" order="3" class="net.ldauvilaire.beanio.bean.TransactionSetTrailer" minOccurs="1" maxOccurs="1">
+					<field name="type" rid="true" literal="TT" />
+				</record>
+
+			</group>
+
+			<record name="functionGroupTrailer" order="3" class="net.ldauvilaire.beanio.bean.FunctionGroupTrailer" minOccurs="1" maxOccurs="1">
+				<field name="type" rid="true" literal="FT" />
+			</record>
+
+		</group>
+
+		<record name="controlTrailer" order="3" class="net.ldauvilaire.beanio.bean.ControlTrailer" minOccurs="1" maxOccurs="1">
+			<field name="type" rid="true" literal="CT" />
+		</record>
+
+	</stream>
+
+	<stream name="g-flr" format="fixedlength" minOccurs="1" maxOccurs="unbounded">
+
+		<record name="controlHeader" order="1" class="net.ldauvilaire.beanio.bean.ControlHeader" minOccurs="1" maxOccurs="1">
+			<field name="type" rid="true" literal="CH" position="0" length="2" trim="true" />
+		</record>
+
+		<group name="functionGroup" order="2" class="net.ldauvilaire.beanio.bean.FunctionGroup" minOccurs="1" maxOccurs="unbounded">
+
+			<record name="functionGroupHeader" order="1" class="net.ldauvilaire.beanio.bean.FunctionGroupHeader" minOccurs="1" maxOccurs="1">
+				<field name="type" rid="true" literal="FH" position="0" length="2" trim="true" />
+				<field name="name" minOccurs="0" position="3" length="unbounded" trim="true"/>
+			</record>
+
+			<group name="transactionSet" order="2" class="net.ldauvilaire.beanio.bean.TransactionSet" collection="list" minOccurs="0" maxOccurs="unbounded">
+
+				<record name="header" order="1" class="net.ldauvilaire.beanio.bean.TransactionSetHeader" minOccurs="1" maxOccurs="1">
+					<field name="type" rid="true" literal="TH" position="0" length="2" trim="true" />
+					<field name="name" minOccurs="0" position="3" length="unbounded" trim="true"/>
+				</record>
+				<record name="transaction" order="2" class="net.ldauvilaire.beanio.bean.Transaction" collection="list" minOccurs="0" maxOccurs="unbounded">
+					<field name="type" rid="true" literal="T" position="0" length="2" trim="true" />
+					<field name="amount" position="3" length="3" trim="true" />
+				</record>
+				<record name="trailer" order="3" class="net.ldauvilaire.beanio.bean.TransactionSetTrailer" minOccurs="1" maxOccurs="1">
+					<field name="type" rid="true" literal="TT" position="0" length="2" trim="true" />
+				</record>
+
+			</group>
+
+			<record name="functionGroupTrailer" order="3" class="net.ldauvilaire.beanio.bean.FunctionGroupTrailer" minOccurs="1" maxOccurs="1">
+				<field name="type" rid="true" literal="FT" position="0" length="2" trim="true" />
+			</record>
+
+		</group>
+
+		<record name="controlTrailer" order="3" class="net.ldauvilaire.beanio.bean.ControlTrailer" minOccurs="1" maxOccurs="1">
+			<field name="type" rid="true" literal="CT" position="0" length="2" trim="true" />
+		</record>
+
+	</stream>
+
+</beanio>
