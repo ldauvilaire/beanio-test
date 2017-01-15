@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<beanio xmlns="http://www.beanio.org/2012/03" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.beanio.org/2012/03 http://www.beanio.org/2012/03/mapping.xsd">
+
+	<stream name="tadast" format="fixedlength" minOccurs="1" maxOccurs="unbounded">
+
+		<record name="headerRecord" order="1" class="net.ldauvilaire.beanio.tadast.HeaderRecord" minOccurs="1" maxOccurs="1">
+			<field name="type" rid="true" regex="INIT|IRG" position="0" length="4" trim="true" />
+			<field name="date" position="4" length="8" trim="true" format="yyyyMMdd" />
+		</record>
+
+		<group name="flightGroup" order="2" class="net.ldauvilaire.beanio.tadast.FlightGroup" collection="list" minOccurs="1" maxOccurs="unbounded">
+
+			<record name="flight" order="1" class="net.ldauvilaire.beanio.tadast.FlightRecord" minOccurs="1" maxOccurs="1">
+				<field name="type" rid="true" literal="v" position="0" length="1" trim="true" />
+				<field name="airlineCode" position="1" length="2" trim="true"/>
+				<field name="flightNumber" position="3" length="4" trim="true"/>
+				<field name="flightIdentifierDate" position="7" length="8" trim="true" format="yyyyMMdd" />
+				<field name="operationalSuffix" position="15" length="1" trim="true"/>
+			</record>
+
+			<group name="flightLegs" order="2" class="net.ldauvilaire.beanio.tadast.FlightLegGroup" collection="list" minOccurs="0" maxOccurs="unbounded">
+
+				<record name="flightLeg" order="1" class="net.ldauvilaire.beanio.tadast.FlightLegRecord" minOccurs="1" maxOccurs="1">
+					<field name="type" rid="true" literal="t" position="0" length="1" trim="true" />
+					<field name="departureStation" position="1" length="3" trim="true"/>
+					<field name="departureDate" position="4" length="14" trim="true" format="yyyyMMddHHmmss"/>
+					<field name="arrivalStation" position="18" length="3" trim="true"/>
+					<field name="arrivalDate" position="21" length="14" trim="true" format="yyyyMMddHHmmss"/>
+				</record>
+
+				<record name="partnerships" order="2" class="net.ldauvilaire.beanio.tadast.PartnershipRecord" collection="list" minOccurs="0" maxOccurs="unbounded">
+					<field name="type" rid="true" literal="c" position="0" length="1" trim="true" />
+					<field name="code1" position="1" length="1" trim="true"/>
+					<field name="value1" position="2" length="2" trim="true"/>
+					<field name="code2" position="4" length="1" trim="true"/>
+					<field name="value2" position="5" length="2" trim="true"/>
+					<field name="code3" position="7" length="1" trim="true"/>
+					<field name="value3" position="8" length="2" trim="true"/>
+				</record>
+
+			</group>
+
+		</group>
+
+	</stream>
+
+</beanio>

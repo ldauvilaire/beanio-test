@@ -9,7 +9,7 @@
 			<field name="type" rid="true" literal="CH" />
 		</record>
 
-		<group name="functionGroup" order="2" class="net.ldauvilaire.beanio.bean.FunctionGroup" minOccurs="1" maxOccurs="unbounded">
+		<group name="functionGroup" order="2" class="net.ldauvilaire.beanio.bean.FunctionGroup" collection="list" minOccurs="1" maxOccurs="unbounded">
 
 			<record name="functionGroupHeader" order="1" class="net.ldauvilaire.beanio.bean.FunctionGroupHeader" minOccurs="1" maxOccurs="1">
 				<field name="type" rid="true" literal="FH" />
@@ -22,7 +22,7 @@
 					<field name="type" rid="true" literal="TH" />
 					<field name="name" minOccurs="0" />
 				</record>
-				<record name="transaction" order="2" class="net.ldauvilaire.beanio.bean.Transaction" collection="list" minOccurs="0" maxOccurs="unbounded">
+				<record name="transaction" order="2" class="net.ldauvilaire.beanio.bean.Transaction" collection="List" minOccurs="0" maxOccurs="unbounded">
 					<field name="type" rid="true" literal="T" />
 					<field name="amount" />
 				</record>
@@ -50,7 +50,7 @@
 			<field name="type" rid="true" literal="CH" position="0" length="2" trim="true" />
 		</record>
 
-		<group name="functionGroup" order="2" class="net.ldauvilaire.beanio.bean.FunctionGroup" minOccurs="1" maxOccurs="unbounded">
+		<group name="functionGroup" order="2" class="net.ldauvilaire.beanio.bean.FunctionGroup" collection="list" minOccurs="1" maxOccurs="unbounded">
 
 			<record name="functionGroupHeader" order="1" class="net.ldauvilaire.beanio.bean.FunctionGroupHeader" minOccurs="1" maxOccurs="1">
 				<field name="type" rid="true" literal="FH" position="0" length="2" trim="true" />

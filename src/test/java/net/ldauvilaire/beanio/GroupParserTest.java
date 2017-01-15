@@ -4,6 +4,10 @@ import java.io.*;
 import java.util.List;
 
 import org.beanio.*;
+import org.beanio.builder.FieldBuilder;
+import org.beanio.builder.GroupBuilder;
+import org.beanio.builder.RecordBuilder;
+import org.beanio.builder.StreamBuilder;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -29,23 +33,133 @@ public class GroupParserTest extends ParserTest {
 
 	private StreamFactory factory;
 
-    @Before
-    public void setup() throws Exception {
-    	LOGGER.info("Loading Stream Definition ...");
-        factory = newStreamFactory("/data/groups/group.xml");
-    }
+	@Before
+	public void setup() {
+	}
 
-    @Test
-    public void testCsvSubgroups() {
-        test("g-csv", "/data/groups/g-csv_subgroups.txt");
-    }
+	@Test
+	public void testCsvWithXmlDefinition() throws IOException {
+		LOGGER.info("Loading Stream Definition ...");
+		factory = newStreamFactory("/data/groups/group.xml");
 
-    @Test
-    public void testFixedLengthSubgroups() {
-        test("g-flr", "/data/groups/g-flr_subgroups.txt");
-    }
+		test("g-csv", "/data/groups/g-csv_subgroups.txt");
+	}
 
-    /**
+	@Test
+	public void testFixedLengthRecordWithXmlDefinition() throws IOException {
+		LOGGER.info("Loading Stream Definition ...");
+		factory = newStreamFactory("/data/groups/group.xml");
+
+		test("g-flr", "/data/groups/g-flr_subgroups.txt");
+	}
+
+	@Test
+	public void testFixedLengthRecordWithJavaApiDefinition() {
+
+		//-- Stream Definition --
+		//-----------------------
+		StreamBuilder streamBuilder = new StreamBuilder("g-flr")
+				.format("fixedlength")
+				.minOccurs(1)
+				.addRecord(new RecordBuilder("controlHeader", ControlHeader.class)
+						.order(1)
+						.occurs(1, 1)
+						.addField(new FieldBuilder("type")
+								.rid()
+								.at(0)
+								.length(2)
+								.trim()
+								.literal("CH"))
+						)
+				.addGroup(new GroupBuilder("functionGroup").type(FunctionGroup.class)
+						.order(2)
+						.occurs(1, -1)
+						.addRecord(new RecordBuilder("functionGroupHeader", FunctionGroupHeader.class)
+								.order(1)
+								.occurs(1, 1)
+								.addField(new FieldBuilder("type")
+										.rid()
+										.at(0)
+										.length(2)
+										.trim()
+										.literal("FH"))
+								.addField(new FieldBuilder("name")
+										.at(3)
+										.length(8)
+										.trim())
+								)
+						.addGroup(new GroupBuilder("transactionSet").type(TransactionSet.class)
+								.order(2)
+								.occurs(0, -1)
+								.collection(List.class)
+								.addRecord(new RecordBuilder("header", TransactionSetHeader.class)
+										.order(1)
+										.occurs(1, 1)
+										.addField(new FieldBuilder("type")
+												.rid()
+												.at(0)
+												.length(2)
+												.trim()
+												.literal("TH"))
+										.addField(new FieldBuilder("name")
+												.at(3)
+												.length(16)
+												.trim())
+										)
+								.addRecord(new RecordBuilder("transaction", Transaction.class)
+										.order(2)
+										.occurs(0, -1)
+										.collection(List.class)
+										.addField(new FieldBuilder("type")
+												.rid()
+												.at(0)
+												.length(2)
+												.trim()
+												.literal("T"))
+										.addField(new FieldBuilder("amount")
+												.at(3)
+												.length(3)
+												.trim())
+										)
+								.addRecord(new RecordBuilder("trailer", TransactionSetTrailer.class)
+										.order(3)
+										.occurs(1, 1)
+										.addField(new FieldBuilder("type")
+												.rid()
+												.at(0)
+												.length(2)
+												.trim()
+												.literal("TT"))
+										)
+								)
+						.addRecord(new RecordBuilder("functionGroupTrailer", FunctionGroupTrailer.class)
+								.order(3)
+								.occurs(1, 1)
+								.addField(new FieldBuilder("type")
+										.rid()
+										.at(0)
+										.length(2)
+										.trim()
+										.literal("FT"))
+								)
+					)
+				.addRecord(
+						new RecordBuilder("controlTrailer", ControlTrailer.class)
+							.order(3)
+							.occurs(1, 1)
+							.addField(
+									new FieldBuilder("type").rid().at(0).length(2).trim().literal("CT")
+								)
+					)
+				;
+
+		factory = StreamFactory.newInstance();
+		factory.define(streamBuilder);
+
+		test("g-flr", "/data/groups/g-flr_subgroups.txt");
+	}
+
+	/**
      * Fully parses the given file.
      * @param name the name of the stream
      * @param filename the name of the file to test
@@ -54,7 +168,8 @@ public class GroupParserTest extends ParserTest {
         test(name, filename, -1);
     }
 
-    /**
+
+    	/**
      * Fully parses the given file.
      * @param streamName the name of the stream
      * @param filename the name of the file to test
@@ -66,6 +181,10 @@ public class GroupParserTest extends ParserTest {
     	BeanReader in = factory.createReader(streamName, new InputStreamReader(
             getClass().getResourceAsStream(filename)));
 
+    	test(in, filename, errorLineNumber);
+    }
+
+    protected void test(BeanReader in, String filename, int errorLineNumber) {
         try {
         	int index = 1;
         	LOGGER.info("Reading Iteration {} ...", index);
@@ -151,15 +270,14 @@ public class GroupParserTest extends ParserTest {
             	item = in.read();
             }
         	LOGGER.info("End at Iteration {}.", index);
-        }
-        catch (BeanReaderException ex) {
+
+        } catch (BeanReaderException ex) {
             if (errorLineNumber > 0) {
                 // assert the line number from the exception matches expected
                 Assert.assertEquals(errorLineNumber, ex.getRecordContext().getLineNumber());
             }
             throw ex;
-        }
-        finally {
+        } finally {
             in.close();
         }
     }
